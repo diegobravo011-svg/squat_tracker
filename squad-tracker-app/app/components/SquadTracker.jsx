@@ -805,15 +805,15 @@ export default function SquadTracker() {
     }}>
 
       {/* ── HEADER ── */}
-      <header style={{
-        borderBottom: `1px solid ${C.borderLight}`, padding: "13px 24px",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
+      <header className="sq-header" style={{
+        borderBottom: `1px solid ${C.borderLight}`,
         backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
         position: "sticky", top: 0, zIndex: 100,
         background: "rgba(237,229,216,0.88)",
         boxShadow: `0 1px 12px ${C.shadow}`,
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        {/* Brand */}
+        <div className="sq-header-brand">
           <div style={{
             display: "flex", alignItems: "center", gap: 9,
             padding: "6px 14px 6px 9px",
@@ -828,75 +828,67 @@ export default function SquadTracker() {
             }}>🗺</div>
             <div>
               <div style={{ fontFamily: "var(--font-space-grotesk), sans-serif", fontSize: 13, fontWeight: 700, color: C.textPrimary, lineHeight: 1.1 }}>Squad Tracker</div>
-              <div style={{ fontFamily: "var(--font-space-mono), monospace", fontSize: 8, color: C.greenLichen, letterSpacing: 1.8, textTransform: "uppercase" }}>by Interius</div>
+              <div className="sq-brand-sub" style={{ fontFamily: "var(--font-space-mono), monospace", fontSize: 8, color: C.greenLichen, letterSpacing: 1.8, textTransform: "uppercase" }}>by Interius</div>
             </div>
           </div>
           <span style={{
-            fontSize: 10, padding: "2px 9px", borderRadius: 20,
+            fontSize: 10, padding: "2px 8px", borderRadius: 20,
             background: `rgba(27,179,154,0.12)`, border: `1px solid rgba(27,179,154,0.3)`,
             color: C.emerald, fontFamily: "var(--font-space-mono), monospace",
           }}>● LIVE</span>
         </div>
 
-        {/* Progreso App Nahueroute */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        {/* Progreso */}
+        <div className="sq-header-progress" style={{ alignItems: "center", gap: 10 }}>
           <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "monospace", letterSpacing: 1.4, textTransform: "uppercase" }}>App Nahueroute</div>
-            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: "var(--font-space-mono), monospace", color: userColor, lineHeight: 1.1 }}>{globalPct}%</div>
+            <div style={{ fontSize: 9, color: C.textMuted, fontFamily: "monospace", letterSpacing: 1.2, textTransform: "uppercase" }}>Nahueroute</div>
+            <div style={{ fontSize: 20, fontWeight: 700, fontFamily: "var(--font-space-mono), monospace", color: userColor, lineHeight: 1.1 }}>{globalPct}%</div>
           </div>
-          <Ring progress={globalPct} size={48} stroke={5} color={userColor} />
+          <Ring progress={globalPct} size={42} stroke={4} color={userColor} />
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ display: "flex", marginRight: 4 }}>
+        {/* Acciones */}
+        <div className="sq-header-actions">
+          <div className="sq-avatars" style={{ marginRight: 2 }}>
             {TEAM.map(name => (
               <div key={name} title={name} style={{
-                width: 30, height: 30, borderRadius: "50%",
+                width: 28, height: 28, borderRadius: "50%",
                 background: `linear-gradient(135deg, ${TEAM_COLORS[name]}cc, ${TEAM_COLORS[name]})`,
                 border: `2px solid ${C.bgPage}`,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 11, fontWeight: 800, color: "#fff", marginLeft: -7,
-                opacity: name === currentUser ? 1 : 0.4, transition: "opacity 0.2s",
+                fontSize: 11, fontWeight: 800, color: "#fff", marginLeft: -6,
+                opacity: name === currentUser ? 1 : 0.38, transition: "opacity 0.2s",
                 boxShadow: name === currentUser ? `0 0 0 2px ${TEAM_COLORS[name]}88` : "none",
               }}>{name[0]}</div>
             ))}
           </div>
 
           <button onClick={() => setShowSummary(true)} style={{
-            padding: "7px 13px", borderRadius: 9,
+            padding: "7px 12px", borderRadius: 9,
             background: "rgba(255,255,255,0.72)", border: `1px solid ${C.borderCard}`,
             color: C.textSecondary, cursor: "pointer", fontSize: 12,
             fontFamily: "var(--font-space-mono), monospace",
-            boxShadow: `0 1px 4px ${C.shadow}`, transition: "all 0.18s",
-          }}
-            onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.97)"}
-            onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.72)"}
-          >📋 Resumen</button>
+            boxShadow: `0 1px 4px ${C.shadow}`, flexShrink: 0,
+          }}>📋 Resumen</button>
 
           <button onClick={() => setShowAddModal(true)} style={{
-            padding: "7px 16px", borderRadius: 9,
+            padding: "7px 14px", borderRadius: 9,
             background: `linear-gradient(135deg, ${userColor}, ${C.greenForest})`,
             border: "none", color: "#fff", cursor: "pointer",
             fontSize: 13, fontWeight: 800, fontFamily: "var(--font-space-mono), monospace",
-            boxShadow: `0 3px 12px ${userColor}44`, transition: "opacity 0.18s",
-          }}
-            onMouseEnter={e => e.currentTarget.style.opacity = "0.87"}
-            onMouseLeave={e => e.currentTarget.style.opacity = "1"}
-          >+ Tarea</button>
+            boxShadow: `0 3px 12px ${userColor}44`, flexShrink: 0,
+          }}>+ Tarea</button>
 
           <button onClick={() => setCurrentUser(null)} style={{
             background: "rgba(255,255,255,0.65)", border: `1px solid ${C.borderCard}`,
-            color: C.textMuted, cursor: "pointer", fontSize: 15, padding: "7px 10px",
-            borderRadius: 9, transition: "all 0.18s", boxShadow: `0 1px 4px ${C.shadow}`,
-          }} title="Cambiar usuario"
-            onMouseEnter={e => { e.currentTarget.style.color = C.textPrimary; e.currentTarget.style.background = "rgba(255,255,255,0.97)"; }}
-            onMouseLeave={e => { e.currentTarget.style.color = C.textMuted; e.currentTarget.style.background = "rgba(255,255,255,0.65)"; }}
-          >⇄</button>
+            color: C.textMuted, cursor: "pointer", fontSize: 15, padding: "7px 9px",
+            borderRadius: 9, flexShrink: 0,
+          }} title="Cambiar usuario">⇄</button>
         </div>
       </header>
 
       {/* ── STATS ── */}
-      <div style={{ display: "flex", padding: "12px 24px", gap: 8, borderBottom: `1px solid ${C.borderLight}` }}>
+      <div className="sq-stats" style={{ borderBottom: `1px solid ${C.borderLight}` }}>
         {[
           { label: "Total",       value: tasks.length,                                                 icon: "◈", color: C.textPrimary },
           { label: "Completadas", value: done,                                                          icon: "✓", color: C.greenForest },
@@ -919,7 +911,7 @@ export default function SquadTracker() {
       </div>
 
       {/* ── CATEGORY FILTER ── */}
-      <div style={{ padding: "12px 24px", display: "flex", gap: 7, overflowX: "auto" }}>
+      <div className="sq-categories">
         {allCategories.map(cat => (
           <button key={cat} onClick={() => setActiveCategory(cat)} style={{
             padding: "6px 16px", borderRadius: 20,
@@ -936,7 +928,7 @@ export default function SquadTracker() {
       </div>
 
       {/* ── COLUMNS ── */}
-      <main style={{ padding: "4px 24px 56px" }}>
+      <main className="sq-main" style={{ padding: "4px 24px 56px" }}>
         {loading ? (
           <div style={{ textAlign: "center", padding: "80px 0" }}>
             <div style={{
@@ -949,11 +941,7 @@ export default function SquadTracker() {
             </p>
           </div>
         ) : (
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))",
-            gap: 16, animation: "fadeUp 0.4s ease",
-          }}>
+          <div className="sq-grid">
             {Object.keys(grouped).length === 0 && (
               <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "70px 0", color: C.textMuted, fontFamily: "monospace", fontSize: 12 }}>
                 Sin tareas todavía — ¡presiona &quot;+ Tarea&quot;!
