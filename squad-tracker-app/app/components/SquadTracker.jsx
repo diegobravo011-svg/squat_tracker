@@ -7,7 +7,7 @@ import { useState, useEffect, useRef } from "react";
 // ============================================================
 const SUPABASE_URL = "https://ojuibtesufcpmgzrylbl.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_yNR_bvFnmymtoyYskbQgLA_lSsvfcif";
-const GEMINI_KEY = "AIzaSyBkgngp3t_SzzhVuvnI7STqSrXGEJx6U6c";
+// Gemini API Key vive en /app/api/summary/route.js (server-side)
 
 const H = {
   apikey: SUPABASE_ANON_KEY,
@@ -560,19 +560,19 @@ function SummaryModal({ tasks, subtasks, onClose }) {
     const prompt = `Eres el asistente del equipo Interius (Diego, Martin, Rorro, Zarko). Genera un resumen semanal conciso y motivador de su proyecto App Nahueroute.\n\nProgreso global: ${global}%\n\nDetalle de tareas:\n${taskDetail}\n\nEscribe en español con 3 secciones claras:\n✅ Logros\n🔄 En curso\n📌 Próxima semana\n\nMáximo 220 palabras. Tono directo, motivador y profesional. Menciona a las personas por su nombre.`;
 
     try {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-        }
-      );
+      const res = await fetch("/api/summary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
       const data = await res.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      setSummary(text || "No se pudo generar el resumen.");
+      if (data.error) {
+        setSummary(`Error de Gemini: ${data.error}`);
+      } else {
+        setSummary(data.summary || "No se pudo generar el resumen.");
+      }
     } catch (err) {
-      setSummary(`Error al conectar con Gemini: ${err.message}`);
+      setSummary(`Error de conexión: ${err.message}`);
     }
     setLoading(false);
   }
