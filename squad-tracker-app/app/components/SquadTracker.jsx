@@ -155,6 +155,8 @@ function TaskCard({ task, subtasks, currentUser, onUpdate, onDelete, onAddSubtas
 
   const color  = TEAM_COLORS[task.assignee] || C.greenLichen;
   const isOwn  = task.assignee === currentUser;
+  // Cualquier miembro del equipo puede editar el progreso (trabajo colaborativo)
+  const canEdit = true;
   const label  = progressLabel(localPct);
   const doneColor = localPct === 100 ? C.greenForest : color;
 
@@ -170,12 +172,13 @@ function TaskCard({ task, subtasks, currentUser, onUpdate, onDelete, onAddSubtas
       progress: val,
       updated_at: new Date().toISOString(),
       status: val === 100 ? "done" : "active",
+      last_updated_by: currentUser,
     });
     setShowNote(true);
   }
   function handleSaveNote() {
     if (noteText.trim()) {
-      onUpdate(task.id, { note: noteText.trim(), note_by: currentUser });
+      onUpdate(task.id, { note: noteText.trim(), note_by: currentUser, last_updated_by: currentUser });
     }
     setNoteText("");
     setShowNote(false);
@@ -223,6 +226,16 @@ function TaskCard({ task, subtasks, currentUser, onUpdate, onDelete, onAddSubtas
                 border: `1px solid ${color}44`,
                 fontFamily: "var(--font-space-mono), monospace",
               }}>{task.assignee}</span>
+              {/* Badge de quién actualizó por última vez (si es diferente al dueño) */}
+              {task.last_updated_by && task.last_updated_by !== task.assignee && (
+                <span style={{
+                  fontSize: 10, padding: "1px 8px", borderRadius: 20,
+                  background: `${TEAM_COLORS[task.last_updated_by] || C.emerald}15`,
+                  color: TEAM_COLORS[task.last_updated_by] || C.emerald, fontWeight: 700,
+                  border: `1px solid ${TEAM_COLORS[task.last_updated_by] || C.emerald}33`,
+                  fontFamily: "var(--font-space-mono), monospace",
+                }}>✎ {task.last_updated_by}</span>
+              )}
               {/* Progress label */}
               <span style={{
                 fontSize: 10, padding: "1px 8px", borderRadius: 20,
@@ -236,6 +249,7 @@ function TaskCard({ task, subtasks, currentUser, onUpdate, onDelete, onAddSubtas
 
           <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
             <MiniRing progress={localPct} color={doneColor} />
+            {/* Solo el dueño puede eliminar */}
             {isOwn && (
               <button onClick={() => onDelete(task.id)} style={{
                 background: "none", border: "none", color: "rgba(26,19,15,0.18)",
@@ -275,32 +289,22 @@ function TaskCard({ task, subtasks, currentUser, onUpdate, onDelete, onAddSubtas
           </div>
         )}
 
-        {/* ─ Slider / Barra ─ */}
+        {/* ─ Slider / Barra — todos pueden editar el progreso ─ */}
         <div style={{ marginTop: 10 }}>
-          {isOwn ? (
-            <div style={{ position: "relative" }}>
-              <input type="range" min={0} max={100} value={localPct}
-                onChange={handleSliderChange}
-                onMouseUp={handleSliderRelease}
-                onTouchEnd={handleSliderRelease}
-                style={{ width: "100%", height: 6, cursor: "pointer", accentColor: doneColor, borderRadius: 4 }}
-              />
-              <div style={{
-                position: "absolute", top: -1, left: 0,
-                width: `${localPct}%`, height: 6,
-                background: `linear-gradient(90deg, ${color}55, ${doneColor})`,
-                borderRadius: 4, pointerEvents: "none", transition: "width 0.3s",
-              }} />
-            </div>
-          ) : (
-            <div style={{ height: 4, borderRadius: 4, background: "rgba(94,125,90,0.12)", overflow: "hidden" }}>
-              <div style={{
-                height: "100%", width: `${localPct}%`,
-                background: `linear-gradient(90deg, ${color}66, ${doneColor})`,
-                borderRadius: 4, transition: "width 0.8s",
-              }} />
-            </div>
-          )}
+          <div style={{ position: "relative" }}>
+            <input type="range" min={0} max={100} value={localPct}
+              onChange={handleSliderChange}
+              onMouseUp={handleSliderRelease}
+              onTouchEnd={handleSliderRelease}
+              style={{ width: "100%", height: 6, cursor: "pointer", accentColor: doneColor, borderRadius: 4 }}
+            />
+            <div style={{
+              position: "absolute", top: -1, left: 0,
+              width: `${localPct}%`, height: 6,
+              background: `linear-gradient(90deg, ${color}55, ${doneColor})`,
+              borderRadius: 4, pointerEvents: "none", transition: "width 0.3s",
+            }} />
+          </div>
         </div>
 
         {/* ─ Input de Nota (post-slider) ─ */}
@@ -369,6 +373,7 @@ function TaskCard({ task, subtasks, currentUser, onUpdate, onDelete, onAddSubtas
                 display: "flex", alignItems: "center", gap: 8, marginBottom: 5,
                 padding: "4px 0",
               }}>
+                {/* Todos pueden marcar subtareas */}
                 <input type="checkbox" checked={s.completed}
                   onChange={() => onToggleSubtask(s.id, !s.completed)}
                   style={{ width: 14, height: 14, cursor: "pointer", accentColor: color }}
@@ -378,6 +383,7 @@ function TaskCard({ task, subtasks, currentUser, onUpdate, onDelete, onAddSubtas
                   textDecoration: s.completed ? "line-through" : "none",
                   transition: "all 0.2s",
                 }}>{s.title}</span>
+                {/* Solo el dueño elimina subtareas */}
                 {isOwn && (
                   <button onClick={() => onDeleteSubtask(s.id)} style={{
                     background: "none", border: "none", color: "rgba(26,19,15,0.15)",
